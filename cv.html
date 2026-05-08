@@ -202,6 +202,40 @@
       top: -100px; right: -200px;
       pointer-events: none;
     }
+    .hero__parallax {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+    .hero__parallax-layer {
+      position: absolute;
+      border-radius: 999px;
+      filter: blur(0px);
+      opacity: 0.9;
+      will-change: transform;
+      transform: translate3d(0, 0, 0);
+    }
+    .hero__parallax-layer--a {
+      width: 520px; height: 520px;
+      left: -140px; top: 80px;
+      background: radial-gradient(circle, rgba(88, 166, 255, 0.22) 0%, rgba(88, 166, 255, 0.04) 45%, transparent 70%);
+      filter: blur(2px);
+    }
+    .hero__parallax-layer--b {
+      width: 420px; height: 420px;
+      right: -160px; top: 260px;
+      background: radial-gradient(circle, rgba(163, 113, 247, 0.20) 0%, rgba(163, 113, 247, 0.05) 45%, transparent 72%);
+      filter: blur(3px);
+    }
+    .hero__parallax-layer--c {
+      width: 700px; height: 700px;
+      left: 40%; bottom: -420px;
+      background: radial-gradient(circle, rgba(88, 166, 255, 0.10) 0%, rgba(88, 166, 255, 0.03) 40%, transparent 68%);
+      filter: blur(6px);
+      opacity: 0.75;
+    }
     .hero__inner {
       max-width: 1100px;
       margin: 0 auto;
@@ -210,6 +244,8 @@
       display: flex;
       align-items: center;
       gap: 64px;
+      position: relative;
+      z-index: 1;
     }
     .hero__content { flex: 1; }
     .hero__badge {
@@ -311,6 +347,18 @@
       overflow: hidden;
       position: relative;
       box-shadow: 0 20px 60px var(--shadow);
+      will-change: transform;
+      transform: translate3d(0, 0, 0);
+    }
+    .hero__avatar-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+      z-index: 1;
     }
     .hero__avatar-placeholder {
       font-size: 5rem;
@@ -318,6 +366,7 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      z-index: 0;
     }
     .hero__avatar-ring {
       position: absolute;
@@ -325,6 +374,7 @@
       border-radius: 28px;
       border: 2px solid var(--accent-subtle-border);
       animation: ring-rotate 8s linear infinite;
+      z-index: 2;
     }
     @keyframes ring-rotate {
       to { transform: rotate(360deg); }
@@ -536,7 +586,7 @@
     #contacts .section { padding: 0 24px; }
     .contacts__grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr;
       gap: 32px;
       align-items: start;
     }
@@ -595,36 +645,8 @@
       color: var(--accent);
       border: 1px solid var(--accent-subtle-border);
     }
-    .contacts__qr {
-      grid-column: 2;
-      grid-row: 1 / 3;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 28px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-      text-align: center;
-    }
-    .qr-placeholder {
-      width: 160px; height: 160px;
-      background: var(--bg-secondary);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid var(--border);
-      overflow: hidden;
-    }
-    .qr-placeholder svg { width: 100%; height: 100%; }
-    .qr-label { font-size: 0.85rem; color: var(--text-secondary); font-weight: 500; }
-    .qr-sublabel { font-size: 0.75rem; color: var(--text-muted); }
     @media (max-width: 768px) {
       .contacts__grid { grid-template-columns: 1fr; }
-      .contacts__qr { grid-column: 1; grid-row: auto; }
     }
 
     /* ===================== SCROLL TO TOP ===================== */
@@ -685,7 +707,7 @@
   <!-- ===================== HEADER ===================== -->
   <header class="header" id="header" role="banner">
     <div class="header__inner">
-      <div class="header__logo">BL<span>.</span></div>
+      <div class="header__logo"><span>.</span></div>
       <nav aria-label="Навігація">
         <ul class="header__nav" id="navMenu">
           <li><a href="#hero"       class="header__nav-link" data-section="hero">Головна</a></li>
@@ -707,6 +729,11 @@
   <main>
     <!-- ===================== HERO ===================== -->
     <section id="hero" aria-labelledby="hero-name">
+      <div class="hero__parallax" aria-hidden="true">
+        <span class="hero__parallax-layer hero__parallax-layer--a" data-parallax="0.12"></span>
+        <span class="hero__parallax-layer hero__parallax-layer--b" data-parallax="0.18"></span>
+        <span class="hero__parallax-layer hero__parallax-layer--c" data-parallax="0.08"></span>
+      </div>
       <div class="hero__inner">
         <div class="hero__content reveal">
           <div class="hero__badge">Remote</div>
@@ -723,9 +750,6 @@
             Reactive Forms, REST API та продуктивність (OnPush, lazy loading).
           </blockquote>
           <div class="hero__cta">
-            <a href="assets/cv/bogdan-levishchev-cv.pdf" download class="btn btn--primary">
-              <span>⬇</span> Скачати CV
-            </a>
             <a href="#contacts" class="btn btn--secondary">
               <span>✉</span> Зв'язатися
             </a>
@@ -733,6 +757,12 @@
         </div>
         <div class="hero__avatar reveal" aria-hidden="true">
           <div class="hero__avatar-ring"></div>
+          <img
+            class="hero__avatar-img"
+            src="img/bl-logo.jpg"
+            alt="Фото профілю"
+            loading="lazy"
+          />
           <span class="hero__avatar-placeholder">BL</span>
         </div>
       </div>
@@ -890,7 +920,7 @@
         <div class="reveal">
           <div class="section-divider"></div>
           <h2 class="section-title" id="contacts-title">Контакти</h2>
-          <p class="section-subtitle">Київ, Україна · bogdanlevishchev@gmail.com · LinkedIn</p>
+          <p class="section-subtitle">Київ, Україна · bogdanlevishchev@gmail.com · +380668421126</p>
         </div>
         <div class="contacts__grid">
           <div style="display:flex; flex-direction:column; gap:16px;">
@@ -901,12 +931,12 @@
                 <div class="contact-card__value">bogdanlevishchev@gmail.com</div>
               </div>
             </a>
-            <a href="https://linkedin.com/in/bogdan-levishchev" target="_blank" rel="noopener noreferrer"
+            <a href="https://www.linkedin.com/in/bogdanlevishchev" target="_blank" rel="noopener noreferrer"
                class="contact-card reveal" aria-label="LinkedIn профіль">
               <div class="contact-card__icon">💼</div>
               <div class="contact-card__info">
                 <div class="contact-card__label">LinkedIn</div>
-                <div class="contact-card__value">bogdan-levishchev</div>
+                <div class="contact-card__value">bogdanlevishchev</div>
               </div>
             </a>
             <div class="contacts__cta reveal">
@@ -914,69 +944,10 @@
                 <span style="font-size:0.85rem; color:var(--text-secondary); font-weight:500;">Формат роботи:</span>
                 <span class="badge badge--green">✓ Remote</span>
               </div>
-              <a href="assets/cv/bogdan-levishchev-cv.pdf" download class="btn btn--primary" style="width:fit-content;">
+              <a href="assets/bogdan-levishchev-cv.pdf" download class="btn btn--primary" style="width:fit-content;">
                 <span>⬇</span> Завантажити CV (PDF)
               </a>
             </div>
-          </div>
-
-          <div class="contacts__qr reveal" aria-label="QR-код">
-            <div class="qr-placeholder">
-              <!-- QR Code SVG (decorative) -->
-              <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <rect width="200" height="200" fill="var(--bg-secondary)"/>
-                <!-- Finder pattern TL -->
-                <rect x="10" y="10" width="56" height="56" rx="4" fill="var(--text-primary)"/>
-                <rect x="18" y="18" width="40" height="40" rx="2" fill="var(--bg-secondary)"/>
-                <rect x="26" y="26" width="24" height="24" rx="1" fill="var(--text-primary)"/>
-                <!-- Finder pattern TR -->
-                <rect x="134" y="10" width="56" height="56" rx="4" fill="var(--text-primary)"/>
-                <rect x="142" y="18" width="40" height="40" rx="2" fill="var(--bg-secondary)"/>
-                <rect x="150" y="26" width="24" height="24" rx="1" fill="var(--text-primary)"/>
-                <!-- Finder pattern BL -->
-                <rect x="10" y="134" width="56" height="56" rx="4" fill="var(--text-primary)"/>
-                <rect x="18" y="142" width="40" height="40" rx="2" fill="var(--bg-secondary)"/>
-                <rect x="26" y="150" width="24" height="24" rx="1" fill="var(--text-primary)"/>
-                <!-- Center data modules (decorative) -->
-                <rect x="80" y="10" width="8" height="8" fill="var(--text-primary)"/>
-                <rect x="96" y="10" width="8" height="8" fill="var(--text-primary)"/>
-                <rect x="88" y="18" width="8" height="8" fill="var(--text-primary)"/>
-                <rect x="80" y="26" width="8" height="8" fill="var(--text-primary)"/>
-                <rect x="96" y="26" width="8" height="8" fill="var(--text-primary)"/>
-                <rect x="10" y="80" width="8" height="8" fill="var(--text-primary)"/>
-                <rect x="26" y="80" width="8" height="8" fill="var(--text-primary)"/>
-                <rect x="18" y="88" width="8" height="8" fill="var(--text-primary)"/>
-                <rect x="10" y="96" width="8" height="8" fill="var(--text-primary)"/>
-                <rect x="26" y="96" width="8" height="8" fill="var(--text-primary)"/>
-                <rect x="80" y="80" width="40" height="40" rx="4" fill="var(--accent)" opacity="0.8"/>
-                <rect x="90" y="90" width="20" height="20" rx="2" fill="var(--bg-secondary)"/>
-                <rect x="96" y="96" width="8" height="8" rx="1" fill="var(--accent)"/>
-                <!-- More data modules -->
-                <rect x="134" y="80" width="8" height="8" fill="var(--text-primary)"/>
-                <rect x="150" y="80" width="8" height="8" fill="var(--text-primary)"/>
-                <rect x="166" y="80" width="8" height="8" fill="var(--text-primary)"/>
-                <rect x="142" y="88" width="8" height="8" fill="var(--text-primary)"/>
-                <rect x="158" y="88" width="8" height="8" fill="var(--text-primary)"/>
-                <rect x="134" y="96" width="8" height="8" fill="var(--text-primary)"/>
-                <rect x="150" y="96" width="8" height="8" fill="var(--text-primary)"/>
-                <rect x="80" y="134" width="8" height="8" fill="var(--text-primary)"/>
-                <rect x="96" y="134" width="8" height="8" fill="var(--text-primary)"/>
-                <rect x="112" y="134" width="8" height="8" fill="var(--text-primary)"/>
-                <rect x="88" y="142" width="8" height="8" fill="var(--text-primary)"/>
-                <rect x="104" y="142" width="8" height="8" fill="var(--text-primary)"/>
-                <rect x="80" y="150" width="8" height="8" fill="var(--text-primary)"/>
-                <rect x="96" y="150" width="8" height="8" fill="var(--text-primary)"/>
-                <rect x="112" y="150" width="8" height="8" fill="var(--text-primary)"/>
-                <rect x="134" y="134" width="8" height="8" fill="var(--text-primary)"/>
-                <rect x="158" y="134" width="8" height="8" fill="var(--text-primary)"/>
-                <rect x="150" y="142" width="8" height="8" fill="var(--text-primary)"/>
-                <rect x="134" y="150" width="8" height="8" fill="var(--text-primary)"/>
-                <rect x="158" y="150" width="8" height="8" fill="var(--text-primary)"/>
-                <rect x="166" y="158" width="16" height="8" fill="var(--text-primary)"/>
-              </svg>
-            </div>
-            <div class="qr-label">LinkedIn</div>
-            <div class="qr-sublabel">Левіщев Богдан Дем'янович</div>
           </div>
         </div>
       </div>
@@ -1020,13 +991,41 @@
     const scrollTop = document.getElementById('scrollTop');
     const indicator = document.getElementById('scrollIndicator');
 
-    window.addEventListener('scroll', () => {
-      const sy = window.scrollY;
-      header.classList.toggle('header--scrolled', sy > 20);
-      scrollTop.classList.toggle('visible', sy > 400);
-      const progress = (sy / (document.body.scrollHeight - window.innerHeight)) * 100;
-      indicator.style.width = progress + '%';
-    }, { passive: true });
+    // ---- PARALLAX (reduced-motion aware) ----
+    const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const parallaxLayers = Array.from(document.querySelectorAll('[data-parallax]'));
+    const heroAvatar = document.querySelector('.hero__avatar');
+    let rafId = 0;
+    let lastSy = 0;
+
+    function applyParallax(sy) {
+      if (reduceMotion) return;
+      parallaxLayers.forEach((el) => {
+        const speed = Number(el.dataset.parallax || 0);
+        el.style.transform = `translate3d(0, ${Math.round(sy * speed)}px, 0)`;
+      });
+      if (heroAvatar) {
+        const y = Math.round(sy * 0.06);
+        heroAvatar.style.transform = `translate3d(0, ${y}px, 0)`;
+      }
+    }
+
+    function onScroll() {
+      lastSy = window.scrollY;
+      if (rafId) return;
+      rafId = window.requestAnimationFrame(() => {
+        rafId = 0;
+        const sy = lastSy;
+        header.classList.toggle('header--scrolled', sy > 20);
+        scrollTop.classList.toggle('visible', sy > 400);
+        const progress = (sy / (document.body.scrollHeight - window.innerHeight)) * 100;
+        indicator.style.width = progress + '%';
+        applyParallax(sy);
+      });
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
 
     scrollTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
