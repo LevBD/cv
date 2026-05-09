@@ -136,8 +136,7 @@
     .btn-icon:hover { background: var(--accent-subtle); color: var(--accent); border-color: var(--accent-subtle-border); }
     .hamburger { display: none; }
     @media (max-width: 768px) {
-      .header__nav { display: none; }
-      .header__nav.open {
+      .header__nav {
         display: flex;
         flex-direction: column;
         position: absolute;
@@ -147,8 +146,37 @@
         padding: 8px 16px 16px;
         gap: 2px;
         box-shadow: 0 8px 24px var(--shadow);
+        max-height: 0;
+        opacity: 0;
+        transform: translateY(-8px);
+        overflow: hidden;
+        pointer-events: none;
+        transition: max-height 0.35s ease, opacity 0.25s ease, transform 0.25s ease;
+      }
+      .header__nav.open {
+        max-height: 320px;
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
       }
       .hamburger { display: flex; }
+    }
+
+    .menu-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      z-index: 90;
+    }
+    .menu-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    @media (min-width: 769px) {
+      .menu-backdrop { display: none; }
     }
 
     /* ===================== SECTIONS BASE ===================== */
@@ -248,26 +276,6 @@
       z-index: 1;
     }
     .hero__content { flex: 1; }
-    .hero__badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--accent-subtle);
-      border: 1px solid var(--accent-subtle-border);
-      color: var(--accent);
-      border-radius: 20px;
-      padding: 4px 14px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      margin-bottom: 20px;
-    }
-    .hero__badge::before { content: '●'; font-size: 0.5rem; animation: pulse 2s infinite; }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
     .hero__name {
       font-size: clamp(2.4rem, 5vw, 3.8rem);
       font-weight: 800;
@@ -705,6 +713,7 @@
   <div class="scroll-indicator" id="scrollIndicator"></div>
 
   <!-- ===================== HEADER ===================== -->
+  <div class="menu-backdrop" id="menuBackdrop" aria-hidden="true"></div>
   <header class="header" id="header" role="banner">
     <div class="header__inner">
       <div class="header__logo"><span>.</span></div>
@@ -721,7 +730,7 @@
         <button class="btn-icon" id="themeToggle" aria-label="Перемикач теми" title="Перемикати тему">
           <span id="themeIcon">☀️</span>
         </button>
-        <button class="btn-icon hamburger" id="hamburger" aria-label="Меню" title="Відкрити меню">☰</button>
+        <button class="btn-icon hamburger" id="hamburger" aria-label="Меню" aria-controls="navMenu" aria-expanded="false" title="Відкрити меню">☰</button>
       </div>
     </div>
   </header>
@@ -736,7 +745,6 @@
       </div>
       <div class="hero__inner">
         <div class="hero__content reveal">
-          <div class="hero__badge">Remote</div>
           <h1 class="hero__name" id="hero-name">
             Богдан<br><span class="accent">Левіщев</span>
           </h1>
@@ -983,8 +991,47 @@
     // ---- HAMBURGER ----
     const hamburger = document.getElementById('hamburger');
     const navMenu = document.getElementById('navMenu');
-    hamburger.addEventListener('click', () => navMenu.classList.toggle('open'));
-    navMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => navMenu.classList.remove('open')));
+    const menuBackdrop = document.getElementById('menuBackdrop');
+
+    function isMobileMenu() {
+      return window.matchMedia && window.matchMedia('(max-width: 768px)').matches;
+    }
+
+    function setMenuOpen(nextOpen) {
+      navMenu.classList.toggle('open', nextOpen);
+      if (menuBackdrop) menuBackdrop.classList.toggle('open', nextOpen);
+      if (hamburger) hamburger.setAttribute('aria-expanded', String(nextOpen));
+      document.body.style.overflow = nextOpen ? 'hidden' : '';
+    }
+
+    hamburger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!isMobileMenu()) return;
+      const nextOpen = !navMenu.classList.contains('open');
+      setMenuOpen(nextOpen);
+    });
+
+    navMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => setMenuOpen(false)));
+
+    // Close on outside click (or backdrop click)
+    if (menuBackdrop) menuBackdrop.addEventListener('click', () => setMenuOpen(false));
+    document.addEventListener('click', (e) => {
+      if (!isMobileMenu()) return;
+      if (!navMenu.classList.contains('open')) return;
+      const t = e.target;
+      if (t instanceof Node && (navMenu.contains(t) || hamburger.contains(t))) return;
+      setMenuOpen(false);
+    });
+
+    // Close on Esc
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && navMenu.classList.contains('open')) setMenuOpen(false);
+    });
+
+    // Reset state on resize to desktop
+    window.addEventListener('resize', () => {
+      if (!isMobileMenu()) setMenuOpen(false);
+    });
 
     // ---- SCROLL: header shadow + indicator + scroll-to-top ----
     const header = document.getElementById('header');
